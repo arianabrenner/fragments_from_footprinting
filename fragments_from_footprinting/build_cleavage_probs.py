@@ -59,7 +59,7 @@ def generate_cleav_prob(link_prob: float = 1.0, nuc_prob = 0.0, linker_length: i
         nuc_prob_arr = nuc_prob
 
     else:
-        raise ValueError("nuc_prob_arr not defined")
+        raise ValueError("nuc_prob_arr not properly defined")
 
     
     # Pass an error if the probability array is the wrong size        
