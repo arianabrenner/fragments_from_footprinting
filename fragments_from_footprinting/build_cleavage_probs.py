@@ -1,11 +1,13 @@
-"""Provide the primary functions."""
-
+"""
+Includes functions that create and save the numpy array of cleavage probabilities by nucleotide position.
+"""
+from .params import *
+from numpy import np
 
 def canvas(with_attribution=True):
     """
-    Placeholder function to show example docstring (NumPy format).
-
-    Replace this function and doc string for your own project.
+    Placeholder function from cookiecutter use to ensure modules are properly acessed.
+    Kept in this code base (at least temporarily) for testing
 
     Parameters
     ----------
@@ -22,6 +24,10 @@ def canvas(with_attribution=True):
     if with_attribution:
         quote += "\n\t- Adapted from Henry David Thoreau"
     return quote
+
+def temp(with_attribution=True):
+    print(nrl)
+    return nrl
 
 
 if __name__ == "__main__":
