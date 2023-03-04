@@ -144,7 +144,7 @@ def get_fld(cleavage_prob: np.ndarray, trials: int = 10000, break_rate: int = 15
     np.save('frag_midpts.npy', midpts_all_trials)
     return frag_lens_all_trials, midpts_all_trials
 
-def bin_frags(frag_lens: np.ndarray, midpts: np.ndarray, bin_width: float = 10.):
+def frag_mid_df(frag_lens: np.ndarray, midpts: np.ndarray):
     """
     Make fragment lengths and locations into a pandas dataframe. 
     Limit to only fragment lengths of interest and add optional binning for sparse data.
@@ -155,10 +155,7 @@ def bin_frags(frag_lens: np.ndarray, midpts: np.ndarray, bin_width: float = 10.)
         Array of fragment lengths from all trials (the fragment length distribution).
 
     midpts : np.ndarray
-        The center location of these fragments relative to the simulated nucleotide array. 
-
-    bin_width : float
-        Number of nucleotides to aggregate the midpoints data over for easy visualization purposes and faster runtime.        
+        The center location of these fragments relative to the simulated nucleotide array.   
 
     Returns
     -------
@@ -167,14 +164,14 @@ def bin_frags(frag_lens: np.ndarray, midpts: np.ndarray, bin_width: float = 10.)
     """
 
     # Round to nearest 10 to make the bin mins whole numbers when bin width is set to 10
-    min_range = round(np.min(midpts), -1)
-    max_range = round(np.max(midpts), -1)
-    bin_boundaries = list(np.linspace(min_range,max_range, 1+int((max_range-min_range)/bin_width)))
+    # min_range = round(np.min(midpts), -1)
+    # max_range = round(np.max(midpts), -1)
+    # bin_boundaries = list(np.linspace(min_range,max_range, 1+int((max_range-min_range)/bin_width)))
     #label bin based on bin min value
-    bin_labels = bin_boundaries[:-1] 
+    # bin_labels = bin_boundaries[:-1] 
     frags_and_mids = pd.DataFrame({'frag_len': frag_lens,
                       'midpoints': midpts})
-    frags_and_mids['bin_mins'] = pd.cut(frags_and_mids['midpoints'], bins=bin_boundaries, labels=bin_labels)
+    # frags_and_mids['bin_mins'] = pd.cut(frags_and_mids['midpoints'], bins=bin_boundaries, labels=bin_labels)
     
     #Save data
     frags_and_mids.to_csv('fragment_lens_and_locations.csv')
