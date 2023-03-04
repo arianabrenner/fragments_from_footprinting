@@ -66,13 +66,15 @@ def generate_cleav_prob(link_prob: float = 1.0, nuc_prob = 0.0, linker_length: i
     if len(nuc_prob_arr) != wrap:    
         raise ValueError('Error: nuc_prob_arr not correct length')
 
-
     
     #Iterate through num_nucs times to build complete cleavage array
     cleavage_prob = linker_cleavage_prob_arr
     for i in range(0,num_nucs):
         cleavage_prob = np.concatenate((cleavage_prob,nuc_prob_arr))
         cleavage_prob = np.concatenate((cleavage_prob,linker_cleavage_prob_arr))
+    #convert from list to array
+    cleavage_prob = np.array(cleavage_prob)
+    np.save('cleavage_prob.npy', cleavage_prob)
     return cleavage_prob
 
 if __name__ == "__main__":
