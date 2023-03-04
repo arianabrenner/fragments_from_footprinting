@@ -4,6 +4,6 @@
 from .build_cleavage_probs import *
 from .fragment_lengths import *
 from .params import *
-
+from .visual_standard import *
 
 from ._version import __version__
