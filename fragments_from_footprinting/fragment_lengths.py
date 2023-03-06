@@ -1,11 +1,12 @@
 """
 Run simulations to determine resulting fragment length distributions
 """
-from .params import *
+from .params import max_fragment_length, distance_from_frag_center
 import numpy as np
 import random
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 def get_breaks_to_try(cleavage_array: np.ndarray, breaks_per_nt: float = 1./150.):
     '''Input: the breakage rate as breaks per base pair 
@@ -84,7 +85,7 @@ def get_frag_lens(pot_cut_locs, cut_bool):
     return fragments, midpoints
 
 
-def get_fld(cleavage_prob: np.ndarray, trials: int = 10000, break_rate: int = 150, xmin: int = 50): 
+def get_fld(cleavage_prob: np.ndarray, trials: int = 10000, break_rate: int = 150, xmin: int = 0, save_data = 1): # changed xmin from 50
     """
     Generates fragment length distribution
 
@@ -100,7 +101,7 @@ def get_fld(cleavage_prob: np.ndarray, trials: int = 10000, break_rate: int = 15
         1 break per this many nucleotides.
     
     xmin : int
-        Minimum fragment length to consider. Default is 50nt to compare to RICC-seq simulated data.
+        Minimum fragment length to consider. Previously set default to 50nt to compare to RICC-seq simulated data.
 
     Returns
     -------
@@ -140,8 +141,9 @@ def get_fld(cleavage_prob: np.ndarray, trials: int = 10000, break_rate: int = 15
     frag_lens_all_trials = frag_lens_all_trials[idxs]
     # subset to same indices as frag_lens_all_trials
     midpts_all_trials = midpts_all_trials[idxs]
-    np.save('frag_lens.npy', frag_lens_all_trials)
-    np.save('frag_midpts.npy', midpts_all_trials)
+    if save_data:
+        np.save('frag_lens.npy', frag_lens_all_trials)
+        np.save('frag_midpts.npy', midpts_all_trials) 
     return frag_lens_all_trials, midpts_all_trials
 
 def frag_mid_df(frag_lens: np.ndarray, midpts: np.ndarray):
@@ -188,6 +190,43 @@ move to differnet module
 #     plt.show()
 #     return
 
+def vplot_data(df, max_frag: int = max_fragment_length, dist_from_center: int = distance_from_frag_center, bin_lens: int = 1, bin_locs: int = 10, save_data = 1):
+    """
+    Take a dataframe with the fragment lengths and midpoints and generate
+    a 2D array containing the vplot data.
+    
+    Parameters
+    ---------
+    df : pd.DataFrame
+        Dataframe containing fragment lengths and midpoints 
 
+    bin_lens : int, default = 1 
+        Bin fragment lengths together for graphing sparser data
 
+    bin_locs : int, default = 10.
+        Bin midpoint locations for graphing sparser data.
 
+    save_data : bool
+        Boolean indicating whether or not to save numpy array.
+
+    Returns
+    -------
+    vplot_input : np.ndarray
+        Array of vplot data where each row is a fragment length and 
+
+    """
+    min_range = -1. * dist_from_center
+    max_range = dist_from_center
+    # midpt_bin_width = 10.
+    bin_boundaries = list(np.linspace(min_range,max_range, 1+int((max_range-min_range)/bin_locs)))
+    bin_labels = bin_boundaries[:-1]
+    
+    min_frag = 0.
+    bin_len_boundaries = list(np.linspace(min_frag,max_frag, 1+int((max_frag-min_frag)/bin_lens)))
+    
+    #To do in previous code make midpoint relative to fragment cetner
+    frags_and_mids = df[(df.frag_len < max_frag) & (np.abs(df.midpoints) < dist_from_center)]
+    vplot_arr, x_edges, y_edges = np.histogram2d(x=frags_and_mids["midpoints"], y=frags_and_mids["frag_len"], bins=[len(bin_labels),len(bin_len_boundaries[:-1])])
+    if save_data:
+        np.save("vplot_arr.npy", vplot_arr)
+    return vplot_arr

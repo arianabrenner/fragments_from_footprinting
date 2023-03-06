@@ -35,3 +35,28 @@ def test_get_breaks_to_try():
     print("Average Num. Breaks from Simulation and Expected Num. Breaks are within 1bp of each other: "+str(testresult))
     print("Observed Difference is : "+str(diff_amount)+'bp')
     assert diff_amount < 1
+
+def test_get_fld():
+    example_cp = ff.generate_cleav_prob()
+    frags, mids = ff.get_fld(example_cp, trials = 10, save_data = 0)
+    assert len(frags) == len(mids)
+    # Midpoints must be greater than 0 and less than total number of nucs (to do: import this number)
+    assert np.min(mids) > 0
+    # Add assertion that the max frag len is less than total numb nucleotides
+
+def test_vplot_data():
+    """
+    Test that the vplot_data returns an array of the correct size
+    """
+    example_cp = ff.generate_cleav_prob()
+    frags, mids = ff.get_fld(example_cp, trials = 10, save_data = 0)
+    fm_df = ff.frag_mid_df(frags, mids)
+    max_frag_ = 300
+    dist_from_center_ = 500
+    bin_lens_ = 3 
+    bin_locs_ = 20
+    vplot_arr = ff.vplot_data(fm_df, max_frag = max_frag_, dist_from_center = dist_from_center_, bin_lens = bin_lens_, bin_locs = bin_locs_, save_data = 0)
+    expected_rows = (2. * dist_from_center_) / bin_locs_
+    expected_cols = max_frag_ / bin_lens_
+    observed_shape = np.shape(vplot_arr)
+    assert (expected_rows == observed_shape[0]) & (expected_cols == observed_shape[1])
