@@ -1,7 +1,7 @@
 """
 Run simulations to determine resulting fragment length distributions
 """
-from .params import max_fragment_length, distance_from_frag_center
+from .params import max_fragment_length, distance_from_frag_center, fiber_midpoint
 import numpy as np
 import random
 import pandas as pd
@@ -175,7 +175,9 @@ def frag_mid_df(frag_lens: np.ndarray, midpts: np.ndarray):
                       'midpoints': midpts})
     # frags_and_mids['bin_mins'] = pd.cut(frags_and_mids['midpoints'], bins=bin_boundaries, labels=bin_labels)
     
-    #Save data
+    # Record midpoint relative to fragment center
+    frags_and_mids["relative_mid"] = frags_and_mids["midpoints"] - fiber_midpoint
+    # Save data
     frags_and_mids.to_csv('fragment_lens_and_locations.csv')
     return frags_and_mids
 
@@ -225,8 +227,8 @@ def vplot_data(df, max_frag: int = max_fragment_length, dist_from_center: int = 
     bin_len_boundaries = list(np.linspace(min_frag,max_frag, 1+int((max_frag-min_frag)/bin_lens)))
     
     #To do in previous code make midpoint relative to fragment cetner
-    frags_and_mids = df[(df.frag_len < max_frag) & (np.abs(df.midpoints) < dist_from_center)]
-    vplot_arr, x_edges, y_edges = np.histogram2d(x=frags_and_mids["midpoints"], y=frags_and_mids["frag_len"], bins=[len(bin_labels),len(bin_len_boundaries[:-1])])
+    frags_and_mids = df[(df.frag_len < max_frag) & (np.abs(df.relative_mid) < dist_from_center)]
+    vplot_arr, x_edges, y_edges = np.histogram2d(x=frags_and_mids["relative_mid"], y=frags_and_mids["frag_len"], bins=[len(bin_labels),len(bin_len_boundaries[:-1])])
     if save_data:
         np.save("vplot_arr.npy", vplot_arr)
     return vplot_arr
