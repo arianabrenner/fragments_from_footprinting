@@ -1,14 +1,14 @@
 """
 Run simulations to determine resulting fragment length distributions
 """
-from .params import max_fragment_length, distance_from_frag_center, fiber_midpoint
+from .params import max_fragment_length, distance_from_frag_center, fiber_midpoint, break_rate, num_trials
 import numpy as np
 import random
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def get_breaks_to_try(cleavage_array: np.ndarray, breaks_per_nt: float = 1./150.):
+def get_breaks_to_try(cleavage_array: np.ndarray, breaks_per_nt: float = 1./(1.*break_rate)):
     '''Input: the breakage rate as breaks per base pair 
            Output: Number of breaks to attempt on a structure to observe the given breakage rate on average  
     '''
@@ -85,7 +85,7 @@ def get_frag_lens(pot_cut_locs, cut_bool):
     return fragments, midpoints
 
 
-def get_fld(cleavage_prob: np.ndarray, trials: int = 10000, break_rate: int = 150, xmin: int = 0, save_data = 1): # changed xmin from 50
+def get_fld(cleavage_prob: np.ndarray, trials: int = num_trials, break_rate: int = break_rate, xmin: int = 0, save_data = 1): # changed xmin from 50
     """
     Generates fragment length distribution
 
@@ -142,8 +142,8 @@ def get_fld(cleavage_prob: np.ndarray, trials: int = 10000, break_rate: int = 15
     # subset to same indices as frag_lens_all_trials
     midpts_all_trials = midpts_all_trials[idxs]
     if save_data:
-        np.save('frag_lens.npy', frag_lens_all_trials)
-        np.save('frag_midpts.npy', midpts_all_trials) 
+        np.save('intermed_data/frag_lens.npy', frag_lens_all_trials)
+        np.save('intermed_data/frag_midpts.npy', midpts_all_trials) 
     return frag_lens_all_trials, midpts_all_trials
 
 def frag_mid_df(frag_lens: np.ndarray, midpts: np.ndarray):
@@ -178,7 +178,7 @@ def frag_mid_df(frag_lens: np.ndarray, midpts: np.ndarray):
     # Record midpoint relative to fragment center
     frags_and_mids["relative_mid"] = frags_and_mids["midpoints"] - fiber_midpoint
     # Save data
-    frags_and_mids.to_csv('fragment_lens_and_locations.csv')
+    frags_and_mids.to_csv('intermed_data/fragment_lens_and_locations.csv')
     return frags_and_mids
 
 """
@@ -230,5 +230,5 @@ def vplot_data(df, max_frag: int = max_fragment_length, dist_from_center: int = 
     frags_and_mids = df[(df.frag_len < max_frag) & (np.abs(df.relative_mid) < dist_from_center)]
     vplot_arr, x_edges, y_edges = np.histogram2d(x=frags_and_mids["relative_mid"], y=frags_and_mids["frag_len"], bins=[len(bin_labels),len(bin_len_boundaries[:-1])])
     if save_data:
-        np.save("vplot_arr.npy", vplot_arr)
+        np.save("intermed_data/vplot_arr.npy", vplot_arr)
     return vplot_arr

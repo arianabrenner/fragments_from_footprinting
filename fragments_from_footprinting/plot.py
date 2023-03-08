@@ -68,6 +68,7 @@ def process_vplot_data(vplot_data: np.ndarray):
     # Min-max normalize counts
     min_max_scaler = preprocessing.MinMaxScaler()
     array_to_plot = min_max_scaler.fit_transform(vplot_data_rotated)
+    np.save('intermed_data/vplot_norm.npy', array_to_plot) # This feature is new
     return array_to_plot
 
 
@@ -87,12 +88,12 @@ def plot_vplot(vplot_data: np.ndarray):
 
     # Load cleavage probability array 
     # Add functionilty to return error if file does not exist
-    clave_prob = np.load('cleavage_prob.npy')
+    cleave_prob = np.load('intermed_data/cleavage_prob.npy')
     min_range = -1. * distance_from_frag_center
     max_range = distance_from_frag_center
     midpoint = fiber_midpoint
     # Subset cleavage probability array to values to plot
-    y_vals = clave_prob[int(min_range)+int(midpoint):int(max_range)+int(midpoint)]
+    y_vals = cleave_prob[int(min_range)+int(midpoint):int(max_range)+int(midpoint)]
     x_vals = np.linspace(min_range, max_range, len(y_vals))
 
     array_to_plot = process_vplot_data(vplot_data)  
@@ -117,7 +118,9 @@ def plot_vplot(vplot_data: np.ndarray):
     cbar = fig.colorbar(im, ax=ax[1], cax=cbar_ax)#shrink=0.35)
     cbar.set_label('Relative Counts')
     # plt.tight_layout()
-    plt.savefig('vplot_w_cleavage_prob.pdf')
+    plt.savefig('plots/vplot_w_cleavage_prob.pdf')
+    plt.show()
+    plt.close()
     return
 
 
@@ -134,15 +137,22 @@ def plot_fld(fld: np.ndarray = None):
     Returns
     -------
     Generates .pdf
+
+    TO DO
+    -----
+    subset to only the fragment lengths less than max considered.
     """
 
-    frag_lens = np.load('frag_lens.npy') # TO DO write if statement if the file does not exist.
+    frag_lens_pre = np.load('intermed_data/frag_lens.npy') # TO DO write if statement if the file does not exist.
+    # Subset to relevant fragments
+    frag_lens = frag_lens_pre[frag_lens_pre < max_fragment_length]
     stored_histogram = sns.histplot(data=frag_lens, binwidth=10, stat= 'probability')
     plt.title('Fragment Length Distribution')
     plt.xlabel('Fragment Length (nt)')
-    plt.tight_layout()
-    plt.savefig('fld.pdf')
+    # plt.tight_layout()
+    plt.savefig('plots/fld.pdf')
     plt.show() 
+    plt.close()
     return
 
 def plot_composite(vplot_data: np.ndarray):#, fld: np.ndarray = None):
@@ -160,12 +170,13 @@ def plot_composite(vplot_data: np.ndarray):#, fld: np.ndarray = None):
 
     TO DO
     -----
-    Improve handling of reading in fld
+    - Improve handling of reading in fld
+    - Need to scale FLD and vplot to accomodate max_fragment_sizes other than 1000
     """
 
     # Load cleavage probability array 
     # Add functionilty to return error if file does not exist
-    clave_prob = np.load('cleavage_prob.npy')
+    clave_prob = np.load('intermed_data/cleavage_prob.npy')
     min_range = -1. * distance_from_frag_center
     max_range = distance_from_frag_center
     midpoint = fiber_midpoint
@@ -210,12 +221,13 @@ def plot_composite(vplot_data: np.ndarray):#, fld: np.ndarray = None):
 
     ax2[1].set_ylabel(' ')
     # Plot fld
-    frag_lens = np.load('frag_lens.npy') # TO DO -- account for when fild does not exist
-    midpts = np.load('frag_midpts.npy') 
+    frag_lens = np.load('intermed_data/frag_lens.npy') # TO DO -- account for when fld does not exist
+    midpts = np.load('intermed_data/frag_midpts.npy') 
     fm = frag_mid_df(frag_lens, midpts)
     data_for_hist = pd.DataFrame(fm[fm.frag_len<max_fragment_length].frag_len)
     sns.histplot(data=data_for_hist, y = 'frag_len', bins=100, stat= 'probability', ax=ax2[1])
+    plt.savefig('plots/vplot_w_fld_and_cleavprob.pdf')
+    plt.show()
+    plt.close()
 
-
-    plt.savefig('vplot_w_fld_and_cleavprob.pdf')
     return

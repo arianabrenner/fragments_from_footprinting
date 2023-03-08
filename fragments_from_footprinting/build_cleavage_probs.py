@@ -74,7 +74,7 @@ def generate_cleav_prob(link_prob: float = 1.0, nuc_prob = 0.0, linker_length: i
         cleavage_prob = np.concatenate((cleavage_prob,linker_cleavage_prob_arr))
     #convert from list to array
     cleavage_prob = np.array(cleavage_prob)
-    np.save('cleavage_prob.npy', cleavage_prob)
+    np.save('intermed_data/cleavage_prob.npy', cleavage_prob)
     return cleavage_prob
 
 if __name__ == "__main__":
