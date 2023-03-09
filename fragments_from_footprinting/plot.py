@@ -5,7 +5,7 @@ Includes functions for plotting the fragment length distribution, vplot, and cle
 
 # Import Modules 
 from .fragment_lengths import *
-from .params import max_fragment_length, distance_from_frag_center, fiber_midpoint
+from .params import max_fragment_length, distance_from_frag_center, fiber_midpoint, nrl, num_nucs, break_rate
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from cycler import cycler
@@ -118,8 +118,9 @@ def plot_vplot(vplot_data: np.ndarray):
     cbar = fig.colorbar(im, ax=ax[1], cax=cbar_ax)#shrink=0.35)
     cbar.set_label('Relative Counts')
     # plt.tight_layout()
+    fig.suptitle(str(num_nucs) + " Nucleosome Fiber with "+str(nrl)+" NRL; 1 break per "+str(break_rate)+" nucleotides")
     plt.savefig('plots/vplot_w_cleavage_prob.pdf')
-    plt.show()
+    plt.show() #for running in jupyter notebook 
     plt.close()
     return
 
@@ -150,6 +151,7 @@ def plot_fld(fld: np.ndarray = None):
     plt.title('Fragment Length Distribution')
     plt.xlabel('Fragment Length (nt)')
     # plt.tight_layout()
+    fig.suptitle(str(num_nucs) + " Nucleosome Fiber with "+str(nrl)+" NRL; 1 break per "+str(break_rate)+" nucleotides")
     plt.savefig('plots/fld.pdf')
     plt.show() 
     plt.close()
@@ -226,6 +228,7 @@ def plot_composite(vplot_data: np.ndarray):#, fld: np.ndarray = None):
     fm = frag_mid_df(frag_lens, midpts)
     data_for_hist = pd.DataFrame(fm[fm.frag_len<max_fragment_length].frag_len)
     sns.histplot(data=data_for_hist, y = 'frag_len', bins=100, stat= 'probability', ax=ax2[1])
+    fig.suptitle(str(num_nucs) + " Nucleosome Fiber with "+str(nrl)+" NRL; 1 break per "+str(break_rate)+" nucleotides")
     plt.savefig('plots/vplot_w_fld_and_cleavprob.pdf')
     plt.show()
     plt.close()
