@@ -4,28 +4,34 @@ Includes functions that create and save the numpy array of cleavage probabilitie
 from .params import *
 import numpy as np
 
-def canvas(with_attribution=True):
+
+def make_dyad_array(dyad_prob: float = 1.0, nuc_prob: float = 0.0, wrap_bp: int = wrap, dyad_width: int = dyad_width):
     """
-    Placeholder function from cookiecutter use to ensure modules are properly acessed.
-    Kept in this code base (at least temporarily) for testing
+    Generate cleavage probability array for nucleosome
 
     Parameters
     ----------
-    with_attribution : bool, Optional, default: True
-        Set whether or not to display who the quote is from.
-
-    Returns
-    -------
-    quote : str
-        Compiled string including quote and optional attribution.
+    dyad_prob : float
+        Maximim probability of dyad cleavage
+    nuc_prob : float or np.ndarray
+        default: 0% chance of cleavage at nucleosome (0.0)
+    dyad_width : int 
+        number of nucleotides in the dyad 
+    wrap_bp : int
+        default: set in params.py
+        Number of base pairs wrapped around the nucleosome.
     """
+    nuc_prob_arr = np.repeat(nuc_prob, wrap)
+    # print("Dyad Probability: "+str(dyad_prob), flush=True)
+    # np.linspace(... dyad_prob-nuc_prob,...) subtract nuc prob because you later add the dyad_diff to nuc_prob_arr
+    gradient = np.linspace(0, dyad_prob-nuc_prob, int(1+np.round(dyad_width/2)))[1:]
+    num_zeros_to_add = (wrap-2*len(gradient)+1)/2
+    zeros_to_add = np.zeros(int(num_zeros_to_add))
+    dyad_diff = np.concatenate((zeros_to_add,gradient,np.flip(gradient)[1:],zeros_to_add))
+    nuc_prob_arr_dyad = nuc_prob_arr + dyad_diff
+    return nuc_prob_arr_dyad
 
-    quote = "The code is but a canvas to our imagination."
-    if with_attribution:
-        quote += "\n\t- Adapted from Henry David Thoreau"
-    return quote
-
-def generate_cleav_prob(link_prob: float = 1.0, nuc_prob = 0.0, linker_length: int = link_len, wrap_bp: int = wrap) -> np.ndarray:
+def generate_cleav_prob(link_prob: float = 1.0, nuc_prob: float = 0.0, linker_length: int = link_len, wrap_bp: int = wrap, dyad_bool = dyad_bool, dyad_width: int = dyad_width) -> np.ndarray:
 
     """
     Generate an array where each item is the cleavage probability of the corresponding base pair.
@@ -35,7 +41,7 @@ def generate_cleav_prob(link_prob: float = 1.0, nuc_prob = 0.0, linker_length: i
     link_prob : float
         default: 100% chance of cleavage at linker (1.0)
     nuc_prob: float or np.ndarray
-        default: 0% change pf cleavage at nucleosome (0.0)
+        default: 0% chance of cleavage at nucleosome (0.0)
     linker_length: int
         default: set in params.py
         Number of base pairs in the DNA linking neighboring nucleosomes. 
@@ -46,11 +52,20 @@ def generate_cleav_prob(link_prob: float = 1.0, nuc_prob = 0.0, linker_length: i
     -------
     cleavage_prob : np.ndarray
         Probability of cleavage corresponding to each nucleotide position. 
+
+    TO DO
+    -----
+    Make the nuc_prob and link_prob variables in the params.csv that are drawn in.
     """
 
     linker_cleavage_prob_arr = np.repeat(link_prob, linker_length)
+
+    # Make dyad array if dyad_bool = True
+    if dyad_bool == 1:
+        # assume max dyad prob is equal to the linker prob unless otherwise specified
+        nuc_prob_arr = make_dyad_array(dyad_prob = link_prob, nuc_prob = nuc_prob, wrap_bp = wrap_bp, dyad_width = dyad_width)
     
-    if type(nuc_prob) == float:
+    elif type(nuc_prob) == float:
         # If nuc_prob is a number, repeat that number n times where n=num nucleotides wrapped around nucleosome
         nuc_prob_arr =np.repeat(nuc_prob, wrap_bp)
 
@@ -78,5 +93,5 @@ def generate_cleav_prob(link_prob: float = 1.0, nuc_prob = 0.0, linker_length: i
     return cleavage_prob
 
 if __name__ == "__main__":
+    print("build_cleavage.py invoked")
     # Do something if this file is invoked on its own
-    print(canvas())

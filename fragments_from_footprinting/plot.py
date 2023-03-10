@@ -147,6 +147,7 @@ def plot_fld(fld: np.ndarray = None):
     frag_lens_pre = np.load('intermed_data/frag_lens.npy') # TO DO write if statement if the file does not exist.
     # Subset to relevant fragments
     frag_lens = frag_lens_pre[frag_lens_pre < max_fragment_length]
+    fig, ax = plt.subplots()
     stored_histogram = sns.histplot(data=frag_lens, binwidth=10, stat= 'probability')
     plt.title('Fragment Length Distribution')
     plt.xlabel('Fragment Length (nt)')
@@ -195,6 +196,7 @@ def plot_composite(vplot_data: np.ndarray):#, fld: np.ndarray = None):
     ax1[0].plot(x_vals, y_vals)
     ax1[0].set_ylabel('Cleavage \n Prob.')
     ax1[0].set_xlim((min_range,max_range))
+    ax1[0].set_ylim((0,1))
     # Get rid of unwanted axes
     ax1[0].spines['right'].set_visible(False)
     ax1[0].spines['top'].set_visible(False)

@@ -40,16 +40,19 @@ def set_parameters(params_file: str = "params.csv"):
     # Simulation parameters
     break_rate = int(np.array(params_df.break_rate))
     num_trials = int(np.array(params_df.num_trials))
+    dyad_bool = int(np.array(params_df.dyad_bool))
+    # dyad_width = int(np.array(params_df.dyad_width))
     
     # Variables for plotting
     max_fragment_length = int(np.array(params_df.max_fragment_length))
     distance_from_frag_center = int(np.array(params_df.distance_from_frag_center))
 
-    return nrl, wrap, num_nucs, max_fragment_length, distance_from_frag_center, break_rate, num_trials
+    return nrl, wrap, num_nucs, max_fragment_length, distance_from_frag_center, break_rate, num_trials, dyad_bool
 
-nrl, wrap, num_nucs, max_fragment_length, distance_from_frag_center, break_rate, num_trials = set_parameters()
+nrl, wrap, num_nucs, max_fragment_length, distance_from_frag_center, break_rate, num_trials, dyad_bool = set_parameters()
 
 
+dyad_width = 15
 # Secondary Parameters
 link_len = nrl - wrap
 fiber_length = nrl * num_nucs + link_len
