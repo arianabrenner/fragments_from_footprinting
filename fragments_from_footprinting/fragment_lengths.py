@@ -181,16 +181,6 @@ def frag_mid_df(frag_lens: np.ndarray, midpts: np.ndarray):
     frags_and_mids.to_csv('intermed_data/fragment_lens_and_locations.csv')
     return frags_and_mids
 
-"""
-move to differnet module
-"""
-# def plot_fld(frags_and_mids, width = 2):
-#     max_y_bin = 1000
-#     min_y = 0#50
-#     data_for_hist = frags_and_mids[frags_and_mids.frag_len<max_y_bin].frag_len
-#     stored_histogram = sns.histplot(data=data_for_hist, binwidth=width, stat= 'probability')
-#     plt.show()
-#     return
 
 def vplot_data(df, max_frag: int = max_fragment_length, dist_from_center: int = distance_from_frag_center, bin_lens: int = 1, bin_locs: int = 10, save_data = 1):
     """
